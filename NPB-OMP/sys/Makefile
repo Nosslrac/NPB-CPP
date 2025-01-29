@@ -12,7 +12,7 @@ all: setparams
 # was compiled and linked
 
 setparams: setparams.cpp ../config/make.def
-	$(UCC) -o setparams setparams.cpp
+	$(UCC) $(C_INC) $(CLINKFLAGS) -o setparams setparams.cpp
 
 
 clean: 

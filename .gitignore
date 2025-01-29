@@ -1,0 +1,6 @@
+**/bin/
+*.o
+make.def
+npbparams.hpp
+setparams
+make.def

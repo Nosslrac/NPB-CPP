@@ -27,7 +27,7 @@
 #---------------------------------------------------------------------------
 # This is the C compiler used for OpenMP programs
 #---------------------------------------------------------------------------
-CC = g++ -std=c++14
+CC = clang++ -std=c++20
 
 
 # This links C programs; usually the same as ${CC}
@@ -43,7 +43,7 @@ C_LIB  = -lm
 #---------------------------------------------------------------------------
 # These macros are passed to the compiler 
 #---------------------------------------------------------------------------
-C_INC = -I../common 
+C_INC = -I../common
 
 
 #---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ CFLAGS	= -O3 -fopenmp -mcmodel=medium
 # Global *link time* flags. Flags for increasing maximum executable 
 # size usually go here. 
 #---------------------------------------------------------------------------
-CLINKFLAGS = -O3 -fopenmp -mcmodel=medium
+CLINKFLAGS =
 
 
 #---------------------------------------------------------------------------
@@ -66,7 +66,7 @@ CLINKFLAGS = -O3 -fopenmp -mcmodel=medium
 # this compiler go here also; typically there are few flags required; hence 
 # there are no separate macros provided for such flags.
 #---------------------------------------------------------------------------
-UCC	= g++ -fopenmp
+UCC	= clang++ -fopenmp
 
 
 #---------------------------------------------------------------------------
