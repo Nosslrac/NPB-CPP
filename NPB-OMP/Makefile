@@ -5,6 +5,9 @@ SFILE=config/suite.def
 default: header
 	@ $(SHELL) sys/print_instructions
 
+all: BT SP LU MG FT IS CG EP
+
+allButIS: BT SP LU MG FT CG EP
 	       
 BT: bt
 bt: header
