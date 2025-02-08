@@ -4,53 +4,64 @@
 # runtime library.
 # Set environment variable OPENMP_DIR to point to the runtime build directory.
 
-outDir=/app/output
-mkdir -p $outDir
 
-outputFile=$outDir/output.txt
-touch $outputFile
+if [[ -z "$1" || ! -d "$1" ]]; then
+    echo "Run script requires an existing writable output directory as argument"
+    exit 1
+fi
 
+outFile=$1/out.txt
+rm -f $outFile
+touch $outFile
+res=$?
 
-if [ -z "$1" ]; then
-    size=A
+if [[ $res -ne 0 ]]; then
+    echo "File system not writable"
+    exit 1
+fi
+
+if [ -z "$2" ]; then
+    size=S
     if [ ! -z "$BENCH_SIZE" ]; then
         size=$BENCH_SIZE
     fi
     echo "Running size $size"
     printf "**Running EP**\n"
-    /app/ep.$size >> $outputFile
+    /app/ep.$size >> $outFile
     printf "**Running BT**\n"
-    /app//bt.$size >> $outputFile
+    /app/bt.$size >> $outFile
     printf "**Running CG**\n"
-    /app/cg.$size >> $outputFile
+    /app/cg.$size >> $outFile
     printf "**Running FT**\n"
-    /app/ft.$size >> $outputFile
+    /app/ft.$size >> $outFile
     printf "**Running IS**\n\n"
-    /app/is.$size >> $outputFile
+    /app/is.$size >> $outFile
     printf "**Running LU**\n"
-    /app/lu.$size >> $outputFile
+    /app/lu.$size >> $outFile
     printf "**Running MG**\n"
-    /app/mg.$size >> $outputFile
+    /app/mg.$size >> $outFile
     printf "**Running SP**\n"
-    /app/sp.$size >> $outputFile
+    /app/sp.$size >> $outFile
     exit 0
-else
-    echo "Running size $1"
-    printf "**Running EP**\n"
-    /app/ep.$1 >> $outputFile
-    printf "**Running BT**\n"
-    /app/bt.$1 >> $outputFile
-    printf "**Running CG**\n"
-    /app/cg.$1 >> $outputFile
-    printf "**Running FT**\n"
-    /app/ft.$1 >> $outputFile
-    printf "**Running IS**\n\n"
-    /app/is.$1 >> $outputFile
-    printf "**Running LU**\n"
-    /app/lu.$1 >> $outputFile
-    printf "**Running MG**\n"
-    /app/mg.$1 >> $outputFile
-    printf "**Running SP**\n"
-    /app/sp.$1 >> $outputFile
 fi
+
+
+echo "Running size $2"
+printf "**Running EP**\n"
+/app/ep.$2 >> $outFile
+printf "**Running BT**\n"
+/app/bt.$2 >> $outFile
+printf "**Running CG**\n"
+/app/cg.$2 >> $outFile
+printf "**Running FT**\n"
+/app/ft.$2 >> $outFile
+printf "**Running IS**\n\n"
+/app/is.$2 >> $outFile
+printf "**Running LU**\n"
+/app/lu.$2 >> $outFile
+printf "**Running MG**\n"
+/app/mg.$2 >> $outFile
+printf "**Running SP**\n"
+/app/sp.$2 >> $outFile
+
 
