@@ -273,7 +273,8 @@ int main(int argc, char **argv){
 	 */
 	#pragma omp parallel private(it,i,j,k)	
 	{
-		#pragma omp for nowait
+		#pragma omp single 
+		#pragma omp taskloop
 		for(j = 0; j < lastrow - firstrow + 1; j++){
 			for(k = rowstr[j]; k < rowstr[j+1]; k++){
 				colidx[k] = colidx[k] - firstcol;
@@ -281,11 +282,13 @@ int main(int argc, char **argv){
 		}
 
 		/* set starting vector to (1, 1, .... 1) */
-		#pragma omp for nowait
+		#pragma omp single 
+		#pragma omp taskloop
 		for(i = 0; i < NA+1; i++){
 			x[i] = 1.0;
 		}
-		#pragma omp for nowait
+		#pragma omp single 
+		#pragma omp taskloop
 		for(j = 0; j<lastcol-firstcol+1; j++){
 			q[j] = 0.0;
 			z[j] = 0.0;
@@ -320,7 +323,8 @@ int main(int argc, char **argv){
 			 * so, first: (z.z)
 			 * --------------------------------------------------------------------
 			 */
-			#pragma omp for reduction(+:norm_temp1,norm_temp2)
+			#pragma omp single
+			#pragma omp taskloop reduction(+:norm_temp1,norm_temp2)
 			for(j = 0; j < lastcol - firstcol + 1; j++){
 				norm_temp1 += x[j] * z[j];
 				norm_temp2 += + z[j] * z[j];
@@ -330,7 +334,8 @@ int main(int argc, char **argv){
 				norm_temp2 = 1.0 / sqrt(norm_temp2);
 
 			/* normalize z to obtain x */
-			#pragma omp for
+			#pragma omp single
+			#pragma omp taskloop
 			for(j = 0; j < lastcol - firstcol + 1; j++){     
 				x[j] = norm_temp2 * z[j];
 			}
@@ -338,7 +343,8 @@ int main(int argc, char **argv){
 		} /* end of do one iteration untimed */
 
 		/* set starting vector to (1, 1, .... 1) */	
-		#pragma omp for
+		#pragma omp single
+		#pragma omp taskloop
 		for(i = 0; i < NA+1; i++){
 			x[i] = 1.0;
 		}
@@ -385,7 +391,8 @@ int main(int argc, char **argv){
 			 * so, first: (z.z)
 			 * --------------------------------------------------------------------
 			 */
-			#pragma omp for reduction(+:norm_temp1,norm_temp2)
+			#pragma omp single
+			#pragma omp taskloop reduction(+:norm_temp1,norm_temp2)
 			for(j = 0; j < lastcol - firstcol + 1; j++){
 				norm_temp1 += x[j]*z[j];
 				norm_temp2 += z[j]*z[j];
@@ -402,7 +409,8 @@ int main(int argc, char **argv){
 				printf("    %5d       %20.14e%20.13e\n", it, rnorm, zeta);
 			}
 			/* normalize z to obtain x */
-			#pragma omp for 
+			#pragma omp single
+			#pragma omp taskloop 
 			for(j = 0; j < lastcol - firstcol + 1; j++){
 				x[j] = norm_temp2 * z[j];
 			}
@@ -519,14 +527,15 @@ static void conj_grad(int colidx[],
 	static double d, sum, rho, rho0;
 
 	cgitmax = 25;
-	#pragma omp single nowait
+	#pragma omp single 
 	{
 
 		rho = 0.0;
 		sum = 0.0;
 	}
 	/* initialize the CG algorithm */
-	#pragma omp for
+	#pragma omp single
+	#pragma omp taskloop
 	for(j = 0; j < naa+1; j++){
 		q[j] = 0.0;
 		z[j] = 0.0;
@@ -540,7 +549,8 @@ static void conj_grad(int colidx[],
 	 * now, obtain the norm of r: First, sum squares of r elements locally...
 	 * --------------------------------------------------------------------
 	 */
-	#pragma omp for reduction(+:rho)
+	#pragma omp single
+	#pragma omp taskloop reduction(+:rho)
 	for(j = 0; j < lastcol - firstcol + 1; j++){
 		rho += r[j]*r[j];
 	}
@@ -561,7 +571,7 @@ static void conj_grad(int colidx[],
 		 * on the Cray t3d - overall speed of code is 1.5 times faster.
 		 */
 
-		#pragma omp single nowait
+		#pragma omp single 
 		{
 			d = 0.0;
 			/*
@@ -573,7 +583,8 @@ static void conj_grad(int colidx[],
 			rho = 0.0;
 		}
 
-		#pragma omp for nowait
+		#pragma omp single 
+		#pragma omp taskloop
 		for(j = 0; j < lastrow - firstrow + 1; j++){
 			suml = 0.0;
 			for(k = rowstr[j]; k < rowstr[j+1]; k++){
@@ -588,7 +599,8 @@ static void conj_grad(int colidx[],
 		 * --------------------------------------------------------------------
 		 */
 
-		#pragma omp for reduction(+:d)
+		#pragma omp single
+		#pragma omp taskloop reduction(+:d)
 		for (j = 0; j < lastcol - firstcol + 1; j++) {
 			d += p[j]*q[j];
 		}
@@ -607,7 +619,8 @@ static void conj_grad(int colidx[],
 		 * ---------------------------------------------------------------------
 		 */
 
-		#pragma omp for reduction(+:rho)
+		#pragma omp single
+		#pragma omp taskloop reduction(+:rho)
 		for(j = 0; j < lastcol - firstcol + 1; j++){
 			z[j] += alpha*p[j];
 			r[j] -= alpha*q[j];
@@ -633,7 +646,8 @@ static void conj_grad(int colidx[],
 		 * p = r + beta*p
 		 * ---------------------------------------------------------------------
 		 */
-		#pragma omp for
+		#pragma omp single
+		#pragma omp taskloop
 		for(j = 0; j < lastcol - firstcol + 1; j++){
 			p[j] = r[j] + beta*p[j];
 		}
@@ -646,7 +660,8 @@ static void conj_grad(int colidx[],
 	 * the partition submatrix-vector multiply
 	 * ---------------------------------------------------------------------
 	 */
-	#pragma omp for nowait
+	#pragma omp single 
+	#pragma omp taskloop
 	for(j = 0; j < lastrow - firstrow + 1; j++){
 		suml = 0.0;
 		for(k = rowstr[j]; k < rowstr[j+1]; k++){
@@ -660,7 +675,8 @@ static void conj_grad(int colidx[],
 	 * at this point, r contains A.z
 	 * ---------------------------------------------------------------------
 	 */
-	#pragma omp for reduction(+:sum)
+	#pragma omp single
+	#pragma omp taskloop reduction(+:sum)
 	for(j = 0; j < lastcol-firstcol+1; j++){
 		suml   = x[j] - r[j];
 		sum += suml*suml;
