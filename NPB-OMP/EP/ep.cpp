@@ -193,7 +193,8 @@ int main(int argc, char **argv){
 
         for (i = 0; i < NQ; i++) qq[i] = 0.0;
 
-       	#pragma omp for reduction(+:sx,sy)
+		#pragma omp single
+       	#pragma omp taskloop reduction(+:sx,sy)
 		for(k=1; k<=np; k++){
 			kk = k_offset + k;
 			t1 = S;

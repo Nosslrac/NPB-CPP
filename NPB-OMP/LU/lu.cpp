@@ -886,7 +886,8 @@ void erhs(){
 	 * xi-direction flux differences
 	 * ---------------------------------------------------------------------
 	 */
-	#pragma omp for
+	#pragma omp single
+	#pragma omp taskloop
 	for(k=1; k<nz-1; k++){
 		for(j=jst; j<jend; j++){
 			for(i=0; i<nx; i++){
@@ -998,7 +999,8 @@ void erhs(){
 	 * eta-direction flux differences
 	 * ---------------------------------------------------------------------
 	 */
-	#pragma omp for
+	#pragma omp single
+	#pragma omp taskloop
 	for(k=1; k<nz-1; k++){
 		for(i=ist; i<iend; i++){
 			for(j=0; j<ny; j++){
@@ -1110,7 +1112,8 @@ void erhs(){
 	 * zeta-direction flux differences
 	 * ---------------------------------------------------------------------
 	 */
-	#pragma omp for
+	#pragma omp single
+	#pragma omp taskloop
 	for(j=jst; j<jend; j++){
 		for(i=ist; i<iend; i++){
 			for(k=0; k<nz; k++){

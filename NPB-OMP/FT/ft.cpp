@@ -402,8 +402,8 @@ static void cffts1(int is,
 		#pragma omp master
 			timer_start(T_FFTX);
 	}
-	
-	#pragma omp for	
+	#pragma omp single
+	#pragma omp taskloop	
 	for(k=0; k<d3; k++){
 		for(jj=0; jj<=d2-FFTBLOCK; jj+=FFTBLOCK){
 			for(j=0; j<FFTBLOCK; j++){
@@ -447,7 +447,8 @@ static void cffts2(int is,
 			timer_start(T_FFTY);
 	}
 
-	#pragma omp for	
+	#pragma omp single
+	#pragma omp taskloop	
 	for(k=0; k<d3; k++){
 		for(ii=0; ii<=d1-FFTBLOCK; ii+=FFTBLOCK){
 			for(j=0; j<d2; j++){
@@ -491,7 +492,8 @@ static void cffts3(int is,
 			timer_start(T_FFTZ);
 	}
 
-	#pragma omp for
+	#pragma omp single
+	#pragma omp taskloop
 	for(j=0; j<d2; j++){
 		for(ii=0; ii<=d1-FFTBLOCK; ii+=FFTBLOCK){
 			for(k=0; k<d3; k++){
@@ -581,7 +583,8 @@ static void checksum(int i,
 	#pragma omp single
 		chk = dcomplex_create(0.0, 0.0);
 
-	#pragma omp for
+	#pragma omp single
+	#pragma omp taskloop
 	for(j=1; j<=1024; j++){
 		q = j % NX;
 		r = (3*j) % NY;
@@ -701,7 +704,8 @@ static void evolve(void* pointer_u0,
 	double (*twiddle)[NY][NX] = (double(*)[NY][NX])pointer_twiddle;
 
 	int i, j, k;
-	#pragma omp for
+	#pragma omp single
+	#pragma omp taskloop
 	for(k=0; k<d3; k++){
 		for(j=0; j<d2; j++){
 			for(i=0; i<d1; i++){
