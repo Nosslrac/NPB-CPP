@@ -543,7 +543,9 @@ static void compute_indexmap(void *pointer_twiddle, int d1, int d2, int d3) {
    * ---------------------------------------------------------------------
    */
   ap = -4.0 * ALPHA * PI * PI;
-#pragma omp parallel for private(i, j, kk, kk2, jj, kj2, ii)
+#pragma omp parallel
+#pragma omp single
+#pragma omp taskloop private(i, j, kk, kk2, jj, kj2, ii)
   for (k = 0; k < d3; k++) {
     kk = ((k + NZ / 2) % NZ) - NZ / 2;
     kk2 = kk * kk;
@@ -592,7 +594,9 @@ static void compute_initial_conditions(void *pointer_u0, int d1, int d2,
  * go through by z planes filling in one square at a time.
  * ---------------------------------------------------------------------
  */
-#pragma omp parallel for private(k, j, x0)
+#pragma omp parallel
+#pragma omp single
+#pragma omp taskloop private(k, j, x0)
   for (k = 0; k < dims[2]; k++) {
     x0 = starts[k];
     for (j = 0; j < dims[1]; j++) {
@@ -767,7 +771,9 @@ static void init_ui(void *pointer_u0, void *pointer_u1, void *pointer_twiddle,
   double(*twiddle)[NY][NX] = (double(*)[NY][NX])pointer_twiddle;
 
   int i, j, k;
-#pragma omp parallel for private(i, j, k)
+#pragma omp parallel
+#pragma omp single
+#pragma omp taskloop private(i, j, k)
   for (k = 0; k < d3; k++) {
     for (j = 0; j < d2; j++) {
       for (i = 0; i < d1; i++) {

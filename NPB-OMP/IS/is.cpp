@@ -372,7 +372,9 @@ void alloc_key_buff() {
     bucket_size[i] = (INT_TYPE *)alloc_mem(sizeof(INT_TYPE) * NUM_BUCKETS);
   }
 
-#pragma omp parallel for
+#pragma omp parallel
+#pragma omp single
+#pragma omp taskloop
   for (i = 0; i < NUM_KEYS; i++)
     key_buff2[i] = 0;
 #else  /*USE_BUCKETS*/
@@ -495,7 +497,9 @@ void full_verify() {
 
 #ifdef USE_BUCKETS
 /* Buckets are already sorted. Sorting keys within each bucket */
-#pragma omp parallel for private(i, j, k, k1) schedule(dynamic)
+#pragma omp parallel
+#pragma omp single
+#pragma omp taskloop private(i, j, k, k1)
   for (j = 0; j < NUM_BUCKETS; j++) {
     k1 = (j > 0) ? bucket_ptrs[j - 1] : 0;
     for (i = k1; i < bucket_ptrs[j]; i++) {
@@ -524,7 +528,9 @@ void full_verify() {
 
   /* Confirm keys correctly sorted: count incorrectly sorted keys, if any */
   j = 0;
-#pragma omp parallel for reduction(+ : j)
+#pragma omp parallel
+#pragma omp single
+#pragma omp taskloop reduction(+ : j)
   for (i = 1; i < NUM_KEYS; i++)
     if (key_array[i - 1] > key_array[i])
       j++;
@@ -581,7 +587,8 @@ void rank(int iteration) {
       work_buff[i] = 0;
 
 /* Determine the number of keys in each bucket */
-#pragma omp for schedule(static)
+#pragma omp single
+#pragma omp taskloop
     for (i = 0; i < NUM_KEYS; i++)
       work_buff[key_array[i] >> shift]++;
 
@@ -600,7 +607,8 @@ void rank(int iteration) {
     }
 
 /* Sort into appropriate bucket */
-#pragma omp for schedule(static)
+#pragma omp single
+#pragma omp taskloop
     for (i = 0; i < NUM_KEYS; i++) {
       k = key_array[i];
       key_buff2[bucket_ptrs[k >> shift]++] = k;
@@ -617,7 +625,8 @@ void rank(int iteration) {
 /* each bucket, which can be done in parallel.  Because the distribution */
 /* of the number of keys in the buckets is Gaussian, the use of */
 /* a dynamic schedule should improve load balance, thus, performance */
-#pragma omp for schedule(dynamic)
+#pragma omp single
+#pragma omp taskloop
     for (i = 0; i < NUM_BUCKETS; i++) {
       /* Clear the work array section associated with each bucket */
       k1 = i * num_bucket_keys;

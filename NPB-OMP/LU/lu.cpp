@@ -400,7 +400,8 @@ void blts(int nx, int ny, int nz, int k, double omega,
   double tmp, tmp1;
   double tmat[5][5], tv[5];
 
-#pragma omp for nowait schedule(static)
+#pragma omp single
+#pragma omp taskloop
   for (j = jst; j < jend; j++) {
     for (i = ist; i < iend; i++) {
       for (m = 0; m < 5; m++) {
@@ -414,7 +415,8 @@ void blts(int nx, int ny, int nz, int k, double omega,
     }
   }
 
-#pragma omp for nowait schedule(static)
+#pragma omp single
+#pragma omp taskloop
   for (j = jst; j < jend; j++) {
 
     if (j != jst) {
@@ -573,7 +575,8 @@ void buts(int nx, int ny, int nz, int k, double omega,
   double tmp, tmp1;
   double tmat[5][5];
 
-#pragma omp for nowait schedule(static)
+#pragma omp single
+#pragma omp taskloop
   for (j = jend - 1; j >= jst; j--) {
     for (i = iend - 1; i >= ist; i--) {
       for (m = 0; m < 5; m++) {
@@ -586,7 +589,8 @@ void buts(int nx, int ny, int nz, int k, double omega,
     }
   }
 
-#pragma omp for nowait schedule(static)
+#pragma omp single
+#pragma omp taskloop
   for (j = jend - 1; j >= jst; j--) {
 
     if (j != jend - 1) {
@@ -796,7 +800,8 @@ void erhs() {
   double u21km1, u31km1, u41km1, u51km1;
   double flux[ISIZ1][5];
 
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (k = 0; k < nz; k++) {
     for (j = 0; j < ny; j++) {
       for (i = 0; i < nx; i++) {
@@ -807,7 +812,8 @@ void erhs() {
     }
   }
 
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (k = 0; k < nz; k++) {
     zeta = ((double)k) / (nz - 1);
     for (j = 0; j < ny; j++) {
@@ -1241,7 +1247,8 @@ void jacld(int k) {
   c1345 = C1 * C3 * C4 * C5;
   c34 = C3 * C4;
 
-#pragma omp for nowait schedule(static)
+#pragma omp single
+#pragma omp taskloop
   for (j = jst; j < jend; j++) {
     for (i = ist; i < iend; i++) {
       /*
@@ -1513,7 +1520,8 @@ void jacu(int k) {
   c1345 = C1 * C3 * C4 * C5;
   c34 = C3 * C4;
 
-#pragma omp for nowait schedule(static)
+#pragma omp single
+#pragma omp taskloop
   for (j = jend - 1; j >= jst; j--) {
     for (i = iend - 1; i >= ist; i--) {
       /*
@@ -1791,7 +1799,8 @@ void l2norm(int nx0, int ny0, int nz0, int ist, int iend, int jst, int jend,
     sum[m] = 0.0;
   }
 
-#pragma omp for nowait
+#pragma omp single
+#pragma omp taskloop
   for (k = 1; k < nz0 - 1; k++) {
     for (j = jst; j < jend; j++) {
       for (i = ist; i < iend; i++) {
@@ -2091,7 +2100,8 @@ void rhs() {
   if (timeron) {
     timer_start(T_RHS);
   }
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (k = 0; k < nz; k++) {
     for (j = 0; j < ny; j++) {
       for (i = 0; i < nx; i++) {
@@ -2116,7 +2126,8 @@ void rhs() {
  * xi-direction flux differences
  * ---------------------------------------------------------------------
  */
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (k = 1; k < nz - 1; k++) {
     for (j = jst; j < jend; j++) {
       for (i = 0; i < nx; i++) {
@@ -2222,7 +2233,8 @@ void rhs() {
  * eta-direction flux differences
  * ---------------------------------------------------------------------
  */
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (k = 1; k < nz - 1; k++) {
     for (i = ist; i < iend; i++) {
       for (j = 0; j < ny; j++) {
@@ -2334,7 +2346,8 @@ void rhs() {
  * zeta-direction flux differences
  * ---------------------------------------------------------------------
  */
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (j = jst; j < jend; j++) {
     for (i = ist; i < iend; i++) {
       for (k = 0; k < nz; k++) {
@@ -2455,7 +2468,8 @@ void setbv() {
  * set the dependent variable values along the top and bottom faces
  * ---------------------------------------------------------------------
  */
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (j = 0; j < ny; j++) {
     for (i = 0; i < nx; i++) {
       exact(i, j, 0, temp1);
@@ -2471,7 +2485,8 @@ void setbv() {
  * set the dependent variable values along north and south faces
  * ---------------------------------------------------------------------
  */
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (k = 0; k < nz; k++) {
     for (i = 0; i < nx; i++) {
       exact(i, 0, k, temp1);
@@ -2487,7 +2502,8 @@ void setbv() {
  * set the dependent variable values along east and west faces
  * ---------------------------------------------------------------------
  */
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (k = 0; k < nz; k++) {
     for (j = 0; j < ny; j++) {
       exact(0, j, k, temp1);
@@ -2656,7 +2672,8 @@ void setiv() {
   double ue_1jk[5], ue_nx0jk[5], ue_i1k[5];
   double ue_iny0k[5], ue_ij1[5], ue_ijnz[5];
 
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
   for (k = 1; k < nz - 1; k++) {
     zeta = ((double)k) / (nz - 1);
     for (j = 1; j < ny - 1; j++) {
@@ -2772,7 +2789,8 @@ void ssor(int niter) {
 #pragma omp master
         timer_start(T_RHS);
       }
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
       for (k = 1; k < nz - 1; k++) {
         for (j = jst; j < jend; j++) {
           for (i = ist; i < iend; i++) {
@@ -2870,7 +2888,8 @@ void ssor(int niter) {
         timer_start(T_ADD);
       }
 
-#pragma omp for
+#pragma omp single
+#pragma omp taskloop
       for (k = 1; k < nz - 1; k++) {
         for (j = jst; j < jend; j++) {
           for (i = ist; i < iend; i++) {
