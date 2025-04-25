@@ -871,7 +871,7 @@ static void norm2u3(void *pointer_r, int n1, int n2, int n3, double *rnm2,
     rnmu_local = 0.0;
   }
 
-#pragma omp parallel
+#pragma omp parallel if (!omp_in_parallel())
   {
 #pragma omp single
       {
@@ -1304,7 +1304,7 @@ static void zero3(void *pointer_z, int n1, int n2, int n3) {
 
   int i1, i2, i3;
 
-#pragma omp parallel
+#pragma omp parallel if (!omp_in_parallel())
   {
 #pragma omp single
     {
